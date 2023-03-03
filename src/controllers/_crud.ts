@@ -562,9 +562,9 @@ export class CrudController<E> extends BaseRoutedController {
    *  :paramName<columnName>         => regEx = ([A-Za-z0-9_]{0,})       // ** based on Express document.
    * ```
    */
-  protected get paramsToColumnNamePairs(): { columnName: string; paramName: string, pattern: string }[] {
+  protected get paramsToColumnNamePairs(): any {
     const matchedPaths = this.resolvedResourcePath.match(/:(\w+)(\([^)]*\))?(<\w+>)?/g)
-    return (matchedPaths || []).reduce<{ columnName: string; paramName: string, pattern: string }[]>((c, str) => {
+    return matchedPaths?.reduce((c, str: string) => {
       const r = str.match(/:(\w+)(\([^)]*\))?(<(\w+)>)?/)
       if (!r) throw CrudError.coded('RES-005 BAD_CONTROLLER_CONFIGURATION', this.resourceName, 'failed to parse/convert columnNamePairs. Check your controller\'s request path pattern.' )
       c.push({
