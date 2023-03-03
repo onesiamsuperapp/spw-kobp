@@ -69,7 +69,7 @@ export interface CrudControllerOption<E> {
   /**
    * Sorting options
    */
-  orderBy: QueryOrderMap
+  orderBy: QueryOrderMap<any>
 
   /**
    * Load a resource for create method.
@@ -160,7 +160,7 @@ export class CrudController<E> extends BaseRoutedController {
       preDelete: [],
       postDelete: [],
       replaceUnderscrollWithEmptyKeyPath: false,
-      defaultPopulate: () => [],
+      defaultPopulate: () => null,
       ...options,
       resourceKeyPath: this.resolvedResourcePath.replace(/<\w+>/g, ''), // removed <columnName> component
     }
@@ -195,7 +195,7 @@ export class CrudController<E> extends BaseRoutedController {
 
     const allReq = this.options.forAllResources(context)
     const preloadInstance = await this.options.loadResourceToCreate(context)
-    let raw = preloadInstance || new this.cnstr()
+    let raw : any = preloadInstance || new this.cnstr()
 
     return await this.getEntityManager(context)
       .transactional(async (t): Promise<E> => {
@@ -233,7 +233,7 @@ export class CrudController<E> extends BaseRoutedController {
   public async getOne(context: KobpServiceContext, manager?: EntityManager, _supressFilters: boolean = false): Promise<E> {
     const query = context.request.query
     const hasPopulate = Boolean(query.populate)
-    const populatedByQuery = (typeof query.populate === 'string' ? query.populate.split(',') : (query.populate || [])).filter(Boolean)
+    const _populatedByQuery : any[] = (typeof query.populate === 'string' ? query.populate.split(',') : (query.populate || [])).filter(Boolean)
 
     const em = manager || this.getEntityManager(context)
     const _filterQueries = await this._filtersQuery(context, em)
@@ -247,8 +247,9 @@ export class CrudController<E> extends BaseRoutedController {
     r = await em.findOne(this.cnstr, where, {
       // filters,
       populate: hasPopulate
-        ? populatedByQuery
+        ? _populatedByQuery
         : this.options.defaultPopulate(context, false),
+      connectionType: 'read'
     }) as E
 
     if (!r) {
@@ -281,7 +282,7 @@ export class CrudController<E> extends BaseRoutedController {
 
     return await this.getEntityManager(context)
       .transactional(async (t): Promise<E> => {
-        let raw: E = await this.getOne(context, t)
+        let raw: any = await this.getOne(context, t)
 
         let sanitizedBody = await this.options.sanitizeInputBody(context, t, body, false)
         sanitizedBody = await this.options.computeUpdatePayload(context, t, raw, sanitizedBody)
@@ -361,7 +362,7 @@ export class CrudController<E> extends BaseRoutedController {
       const metaFilter = meta.filters[f]
       if (requestFilter[f]) {
         const cond = isFunction(metaFilter.cond)
-          ? metaFilter.cond(requestFilter[f], 'read')
+          ? metaFilter.cond(requestFilter[f], 'read', null)
           : metaFilter.cond
         
         if (cond) {
@@ -380,7 +381,7 @@ export class CrudController<E> extends BaseRoutedController {
     const offset = +(query['offset'] || 0)
     const pageSize = +(query['pagesize'] || 20)
     const hasPopulate = Boolean(query.populate)
-    const populatedByQuery = (typeof query.populate === 'string' ? query.populate.split(',') : (query.populate || [])).filter(Boolean)
+    const _populatedByQuery: any[] = (typeof query.populate === 'string' ? query.populate.split(',') : (query.populate || [])).filter(Boolean)
 
     const em = this.getEntityManager(context)
 
@@ -402,8 +403,9 @@ export class CrudController<E> extends BaseRoutedController {
         orderBy: this._orderBy(context),
         filters: await this.options.defaultFilters(context, em),
         populate: hasPopulate
-          ? populatedByQuery
+          ? _populatedByQuery
           : this.options.defaultPopulate(context, true),
+        connectionType: 'read'
       })
 
     // Apply afterLoad hooks
@@ -423,13 +425,13 @@ export class CrudController<E> extends BaseRoutedController {
    * Extract orderBy from incoming `context.request.query`.
    * @param context 
    */
-  private _orderBy(context: KobpServiceContext): QueryOrderMap {
+  private _orderBy(context: KobpServiceContext): QueryOrderMap<any> {
     const req = context.request
     if (req.query.order) {
       const order = req.query.order as string
       const orders = order.split(',')
       return orders
-        .reduce((c, element): QueryOrderMap => {
+        .reduce((c, element): QueryOrderMap<any> => {
           const m = element.match(/^([^ ]+)(\s+(asc|desc))?$/)
           if (!m) throw CrudError.coded('RES-004 QUERY_MALFORM', this.resourceName, 'order MUST has following format `db_field_name_1 asc,db_field_name2,db_field_name_3 desc`')
           return { ...c, [m[1]]: (m[2]?.toLowerCase() ?? 'desc') as any }
@@ -592,7 +594,7 @@ export class CrudController<E> extends BaseRoutedController {
    * @param payload 
    * @returns 
    */
-  protected persistNestedCollection(em: EntityManager, obj: E, payload: any): E {
+  protected persistNestedCollection(em: EntityManager, obj: any, payload: any): E {
     const parentEntity: any = obj
     const cnstr = this.cnstr
     for (const key in parentEntity) {
@@ -629,7 +631,7 @@ export class CrudController<E> extends BaseRoutedController {
           }
         }
         // Removals
-        fromDb.remove(...values(toRemove))
+        fromDb.remove([...values(toRemove)])
         // remove this from payload to assign to object.
         delete payload[key]
       }
