@@ -249,6 +249,7 @@ export class CrudController<E> extends BaseRoutedController {
       populate: hasPopulate
         ? populatedByQuery
         : this.options.defaultPopulate(context, false),
+      connectionType: 'read'
     }) as E
 
     if (!r) {
@@ -404,6 +405,7 @@ export class CrudController<E> extends BaseRoutedController {
         populate: hasPopulate
           ? populatedByQuery
           : this.options.defaultPopulate(context, true),
+        connectionType: 'read'
       })
 
     // Apply afterLoad hooks
