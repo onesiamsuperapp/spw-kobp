@@ -1,5 +1,5 @@
 import type { Populate } from '@mikro-orm/core'
-import type { EntityManager } from '@mikro-orm/mysql-base'
+import type { EntityManager } from '@mikro-orm/postgresql'
 import type { KobpServiceContext, RouteMap } from '..'
 
 import { Collection, QueryOperator, QueryOrderMap, Utils, wrap } from '@mikro-orm/core'
