@@ -47,7 +47,7 @@ export interface CrudControllerOption<E> {
    * - one = use when populate select one
    * - many = use when populate select many
    */
-  defaultPopulate: (ctx: KobpServiceContext, isMany: boolean) => Populate<E> | []
+  defaultPopulate: (ctx: KobpServiceContext, isMany: boolean) => Populate<E> | string[]
 
   /**
    * Injecting filters before any query to be made;
