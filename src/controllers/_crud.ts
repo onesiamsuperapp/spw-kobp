@@ -47,7 +47,7 @@ export interface CrudControllerOption<E> {
    * - one = use when populate select one
    * - many = use when populate select many
    */
-  defaultPopulate: (ctx: KobpServiceContext, isMany: boolean) => Populate<E>
+  defaultPopulate: (ctx: KobpServiceContext, isMany: boolean) => Populate<E> | []
 
   /**
    * Injecting filters before any query to be made;
@@ -160,7 +160,7 @@ export class CrudController<E> extends BaseRoutedController {
       preDelete: [],
       postDelete: [],
       replaceUnderscrollWithEmptyKeyPath: false,
-      defaultPopulate: () => null,
+      defaultPopulate: () => [],
       ...options,
       resourceKeyPath: this.resolvedResourcePath.replace(/<\w+>/g, ''), // removed <columnName> component
     }
