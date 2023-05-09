@@ -3,7 +3,7 @@ name: Node.js Package
 on:
   push:
     branches:
-      - feature/SP-4880-upgrade-mikro-node-replica
+      - release/v0.1.0
 
 jobs:
   publish-npm:

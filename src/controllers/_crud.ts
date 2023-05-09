@@ -379,13 +379,11 @@ export class CrudController<E> extends BaseRoutedController {
   public async index(context: KobpServiceContext): Promise<{ count: number, items: E[] }> {
     const query = context.request.query
     const offset = +(query['offset'] || 0)
-    const DEFAULT_LIMIT = 20
-    let pageSize = DEFAULT_LIMIT
+    let pageSize: number | undefined = undefined // get all
     if (query['pagesize']) {
-        if (+(query['pagesize']) === 0) {
-            pageSize = DEFAULT_LIMIT
+        if (+(query['pagesize']) !== 0) {
+          pageSize = +(query['pagesize'])
         }
-        pageSize = +(query['pagesize'])
     }
     const hasPopulate = Boolean(query.populate)
     const _populatedByQuery: any[] = (typeof query.populate === 'string' ? query.populate.split(',') : (query.populate || [])).filter(Boolean)
