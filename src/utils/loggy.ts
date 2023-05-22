@@ -55,7 +55,7 @@ export class Loggy extends Tracer implements Logger {
     const ctx = this.context
     const headers = ctx.headers || {}
     const errorMessage = (typeof error === 'string' && error) || (typeof error === 'object' && error.message) || ''
-    const ip = [headers['x-real-ip'] as string, ...headers['x-forwarded-for']?.toString().split(',') || [], ...ctx.ips || [], ctx.ip].filter(Boolean)
+    const ip = [headers['x-real-ip']?.toString(), ...headers['x-forwarded-for']?.toString().split(',') || [], ...ctx.ips || [], ctx.ip].filter(Boolean)
     const path = ctx.request?.url
     const method = ctx.request?.method
     const user = ctx.user?.id
