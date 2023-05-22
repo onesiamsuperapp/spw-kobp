@@ -3,7 +3,7 @@ name: Node.js Package
 on:
   push:
     branches:
-      - feature/SP-5138-log-client-IP
+      - master
 
 jobs:
   publish-npm:
