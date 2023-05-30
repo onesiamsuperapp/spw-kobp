@@ -12,7 +12,7 @@ import toPairs from 'lodash/toPairs'
 import isFunction from 'lodash/isFunction'
 
 import { BaseRoutedController } from '.'
-import { ClientErrorCode, KobpError, ServerErrorCode } from '../utils'
+import { ClientErrorCode, KobpError, Loggy, ServerErrorCode } from '../utils'
 import { Middleware } from 'koa'
 
 
@@ -362,8 +362,8 @@ export class CrudController<E> extends BaseRoutedController {
       const metaFilter = meta.filters[f]
       if (requestFilter[f]) {
         const cond = isFunction(metaFilter.cond)
-          ? metaFilter.cond(requestFilter[f], 'read', null)
-          : metaFilter.cond
+          ? await metaFilter.cond(requestFilter[f], 'read', null)
+          : await metaFilter.cond
         
         if (cond) {
           results.push({ '$and': [cond] })
@@ -391,7 +391,7 @@ export class CrudController<E> extends BaseRoutedController {
     const em = this.getEntityManager(context)
 
     const _filterQueries = await this._filtersQuery(context, em)
-
+    Loggy.log('spw-kobp index _filterQueries', _filterQueries)
     const smartWhereClause = {
       ...this.options.forAllResources(context),
       '$and': [
@@ -399,6 +399,7 @@ export class CrudController<E> extends BaseRoutedController {
         ...this._whereClauseByQuery(context),
       ]
     }
+    Loggy.log('spw-kobp index smartWhereClause', smartWhereClause)
 
     let [items, count] = await em.findAndCount(this.cnstr,
       { $and: [smartWhereClause] },
