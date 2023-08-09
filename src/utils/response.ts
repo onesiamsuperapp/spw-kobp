@@ -71,6 +71,8 @@ export enum ClientErrorCode {
    */
   methodNotAllowed = 405,
   
+  requestTimeout = 408,
+
   conflict = 409,
 
   gone = 410,
