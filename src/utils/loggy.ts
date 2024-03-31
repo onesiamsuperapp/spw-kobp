@@ -47,7 +47,7 @@ export class Loggy extends Tracer implements Logger {
   }
 
   error(message: string, error?: string | Error): void {
-    this._print({ finalized: false, message, error: error || '(no-error-message)' })
+    this._print({ finalized: false, message, error: error || message })
   }
 
   private _print(msg: { finalized: boolean, message?: string, error?: string | Error }) {
